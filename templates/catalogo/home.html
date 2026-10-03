@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static moneda %}
 
-{% block title %}Aromatizantes y difusores{% endblock %}
+{% block title %}Diaromas{% endblock %}
 
 {% block contenido %}
   {% include 'partials/alertas.html' %}
@@ -9,19 +9,14 @@
   <!-- Portada -->
   <section class="portada">
     <div class="portada__texto">
-      <p class="portada__etiqueta">Esencias naturales · Hecho a mano</p>
+      <p class="portada__etiqueta">Todo en un solo lugar</p>
       <h1 class="portada__titulo">Tu casa huele<br />como te gustaría que se sintiera.</h1>
-      <p class="portada__bajada">
-        Velas aromáticas, difusores y aceites esenciales de composición limpia. Elige tus
-        favoritos, arma tu carrito y cerramos el pedido por WhatsApp en menos de un minuto.
-      </p>
+      
       <div class="portada__acciones">
         <a class="boton boton--primario boton--grande" href="{% url 'catalogo:listar' %}">
           Ver catálogo
         </a>
-        <a class="boton boton--contorno boton--grande" href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">
-          Preguntar por WhatsApp
-        </a>
+        
       </div>
       <dl class="portada__datos">
         <div>
@@ -30,11 +25,11 @@
         </div>
         <div>
           <dt>Pago</dt>
-          <dd>Por transferencia</dd>
+          <dd>Por transferencia | Efectivo </dd>
         </div>
         <div>
           <dt>Pedido</dt>
-          <dd>Sin intermediarios</dd>
+          <dd>Entrega Inmediata</dd>
         </div>
       </dl>
     </div>
@@ -47,27 +42,7 @@
     </div>
   </section>
 
-  <!-- Categorías -->
-  {% if categorias %}
-    <section class="seccion">
-      <header class="seccion__cabecera">
-        <h2 class="seccion__titulo">Explora por categoría</h2>
-        <a class="enlace-mas" href="{% url 'catalogo:listar' %}">Ver todo →</a>
-      </header>
-      <ul class="rejilla-categorias">
-        {% for categoria in categorias %}
-          <li>
-            <a class="tarjeta-categoria" href="{{ categoria.get_absolute_url }}">
-              <span class="tarjeta-categoria__nombre">{{ categoria.nombre }}</span>
-              <span class="tarjeta-categoria__conteo">
-                {{ categoria.total }} producto{{ categoria.total|pluralize:"s" }}
-              </span>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    </section>
-  {% endif %}
+
 
   <!-- Destacados -->
   <section class="seccion">

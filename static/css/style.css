@@ -10,10 +10,10 @@
 /* --- 1. Variables -------------------------------------------------------- */
 :root {
   /* Paleta corporativa */
-  --color-primario: #4a4e2d;
+  --color-primario: #2c2c1d;
   --color-primario-oscuro: #3a3d22;
   --color-primario-claro: #6b7043;
-  --color-primario-tenue: #e9eade;
+  --color-primario-tenue: #f8f9f4;
 
   --color-secundario: #dddad2;
   --color-secundario-claro: #ebe9e3;
@@ -45,8 +45,8 @@
   --sombra-lg: 0 2px 4px rgba(74, 78, 45, 0.07), 0 18px 48px rgba(74, 78, 45, 0.12);
 
   /* Tipografía */
-  --fuente: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --fuente-titulo: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --fuente: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fuente-titulo: "Eastman Grotesque", system-ui, -apple-system, "Segoe UI", "Inter", "Segoe UI", Roboto, sans-serif;
   --peso-titulo: 600;
 
   /* Métrica */

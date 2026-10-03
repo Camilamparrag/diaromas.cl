@@ -47,8 +47,47 @@ DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]")
 
 CSRF_TRUSTED_ORIGINS = env_list(
-    "CSRF_TRUSTED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000"
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:8000,https://localhost:8000,http://127.0.0.1:8000,https://127.0.0.1:8000,http://localhost:8001,https://localhost:8001,http://127.0.0.1:8001,https://127.0.0.1:8001",
 )
+
+# Forzar inclusión de https://localhost:8000 por si hay override posterior
+if "https://localhost:8000" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://localhost:8000")
+if "https://127.0.0.1:8000" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://127.0.0.1:8000")
+
+# Añadir hosts de Codespaces/preview si existen
+CODESPACE = env("CODESPACE_NAME") or env("GITHUB_CODESPACE_NAME") or ""
+if CODESPACE:
+    CSRF_TRUSTED_ORIGINS.extend([
+        f"https://{CODESPACE}-8000.app.github.dev",
+        f"http://{CODESPACE}-8000.app.github.dev",
+        f"https://{CODESPACE}-8000.{env('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN', 'app.github.dev')}",
+        f"http://{CODESPACE}-8000.{env('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN', 'app.github.dev')}",
+    ])
+
+# También soportar cualquier dominio *.app.github.dev que venga por env
+_extra = env("CSRF_TRUSTED_ORIGINS_EXTRA", "")
+if _extra:
+    CSRF_TRUSTED_ORIGINS.extend([x.strip() for x in _extra.split(",") if x.strip()])
+
+# Incluir el dominio de preview exacto detectado
+CSRF_TRUSTED_ORIGINS.extend([
+    "https://redesigned-space-waddle-6965q9p46qw72xvj-8000.app.github.dev",
+    "http://redesigned-space-waddle-6965q9p46qw72xvj-8000.app.github.dev",
+])
+
+ALLOWED_HOSTS = list(ALLOWED_HOSTS) if isinstance(ALLOWED_HOSTS, list) else []
+ALLOWED_HOSTS.extend(["localhost", "127.0.0.1", "[::1]", "testserver"])
+if CODESPACE:
+    dom = env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+    ALLOWED_HOSTS.append(f"{CODESPACE}-8000.app.github.dev")
+    ALLOWED_HOSTS.append(f"{CODESPACE}-8000.{dom}")
+ALLOWED_HOSTS.extend([
+    "redesigned-space-waddle-6965q9p46qw72xvj-8000.app.github.dev",
+])
+ALLOWED_HOSTS = list({h for h in ALLOWED_HOSTS if h})
 
 # Cookies seguras cuando hay HTTPS en producción
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", False)
