@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Algo salió mal{% endblock %}
+
+{% block contenido %}
+  <section class="vacio vacio--grande">
+    <p class="acceso__eyebrow">Error 500</p>
+    <h1>Tenemos un pequeño problema</h1>
+    <p>Vuelve a intentar en unos minutos. Si persiste, escríbenos por WhatsApp.</p>
+    <a class="boton boton--primario boton--grande" href="{% url 'home' %}">Ir al inicio</a>
+  </section>
+{% endblock %}

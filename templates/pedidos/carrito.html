@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static moneda %}
+
+{% block title %}Tu carrito{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Carrito</span>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1 class="encabezado-seccion__titulo">Tu carrito</h1>
+    {% if items %}
+      <p class="encabezado-seccion__bajada">
+        {{ carrito.unidades }} unidad{{ carrito.unidades|pluralize:"es" }} lista{{ carrito.unidades|pluralize:"s" }} para confirmar.
+      </p>
+    {% endif %}
+  </header>
+
+  {% if items %}
+    <form method="post" action="{% url 'pedidos:actualizar' %}" class="carrito">
+      {% csrf_token %}
+
+      <div class="carrito__tabla">
+        <div class="carrito__cabecera">
+          <span>Producto</span>
+          <span>Precio</span>
+          <span>Cantidad</span>
+          <span>Subtotal</span>
+          <span></span>
+        </div>
+
+        {% for item in items %}
+          <div class="carrito__fila">
+            <div class="carrito__producto">
+              <a href="{{ item.producto.get_absolute_url }}" class="carrito__miniatura">
+                <img
+                  src="{{ item.producto.imagen_url }}"
+                  alt="{{ item.producto.nombre }}"
+                  loading="lazy"
+                  data-fallback="{% static 'img/productos/placeholder.svg' %}"
+                />
+              </a>
+              <div>
+                <a class="carrito__nombre" href="{{ item.producto.get_absolute_url }}">
+                  {{ item.producto.nombre }}
+                </a>
+                <p class="carrito__notas">
+                  {{ item.producto.notas_aroma|default:item.producto.categoria.nombre }}
+                </p>
+                <input type="hidden" name="producto_id[]" value="{{ item.producto.pk }}" />
+              </div>
+            </div>
+
+            <p class="carrito__precio">{{ item.producto.precio|clp }}</p>
+
+            <div class="carrito__cantidad">
+              <input
+                type="number"
+                name="cantidad[]"
+                value="{{ item.cantidad }}"
+                min="0"
+                max="{{ item.producto.stock }}"
+                inputmode="numeric"
+                aria-label="Cantidad de {{ item.producto.nombre }}"
+              />
+            </div>
+
+            <p class="carrito__subtotal">{{ item.subtotal|clp }}</p>
+
+            <button
+              type="submit"
+              form="quitar-{{ item.producto.pk }}"
+              class="boton-icono"
+              title="Quitar del carrito"
+              aria-label="Quitar {{ item.producto.nombre }}"
+            >
+              &times;
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="carrito__acciones">
+        <a class="boton boton--contorno" href="{% url 'catalogo:listar' %}">Seguir comprando</a>
+        <button class="boton boton--primario" type="submit">Actualizar carrito</button>
+      </div>
+    </form>
+
+    <!-- Resumen -->
+    <section class="resumen">
+      <h2 class="resumen__titulo">Resumen</h2>
+
+      <dl class="resumen__lista">
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ carrito.subtotal|clp }}</dd>
+        </div>
+        <div>
+          <dt>Envío</dt>
+          <dd>A coordinar por WhatsApp</dd>
+        </div>
+        <div class="resumen__total">
+          <dt>Total estimado</dt>
+          <dd>{{ carrito.subtotal|clp }}</dd>
+        </div>
+      </dl>
+
+      <p class="resumen__nota">Los precios incluyen IVA. Confirmamos stock y envío por WhatsApp.</p>
+
+      <a class="boton boton--acento boton--grande boton--completo" href="{% url 'pedidos:checkout' %}">
+        Completar mis datos
+      </a>
+      <a class="boton boton--enlace boton--completo" href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">
+        Consultar antes de comprar
+      </a>
+    </section>
+  {% else %}
+    <div class="vacio">
+      <h2>Tu carrito está vacío</h2>
+      <p>Elige un aroma y empieza tu pedido por WhatsApp.</p>
+      <a class="boton boton--primario" href="{% url 'catalogo:listar' %}">Ver catálogo</a>
+    </div>
+  {% endif %}
+
+  {% for item in items %}
+    <form id="quitar-{{ item.producto.pk }}" method="post" action="{% url 'pedidos:quitar' item.producto.pk %}" hidden>
+      {% csrf_token %}
+    </form>
+  {% endfor %}
+{% endblock %}

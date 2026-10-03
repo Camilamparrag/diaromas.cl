@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static moneda %}
+
+{% block title %}Aromatizantes y difusores{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <!-- Portada -->
+  <section class="portada">
+    <div class="portada__texto">
+      <p class="portada__etiqueta">Esencias naturales · Hecho a mano</p>
+      <h1 class="portada__titulo">Tu casa huele<br />como te gustaría que se sintiera.</h1>
+      <p class="portada__bajada">
+        Velas aromáticas, difusores y aceites esenciales de composición limpia. Elige tus
+        favoritos, arma tu carrito y cerramos el pedido por WhatsApp en menos de un minuto.
+      </p>
+      <div class="portada__acciones">
+        <a class="boton boton--primario boton--grande" href="{% url 'catalogo:listar' %}">
+          Ver catálogo
+        </a>
+        <a class="boton boton--contorno boton--grande" href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">
+          Preguntar por WhatsApp
+        </a>
+      </div>
+      <dl class="portada__datos">
+        <div>
+          <dt>Envíos</dt>
+          <dd>Todo Chile</dd>
+        </div>
+        <div>
+          <dt>Pago</dt>
+          <dd>Por transferencia</dd>
+        </div>
+        <div>
+          <dt>Pedido</dt>
+          <dd>Sin intermediarios</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="portada__arte" aria-hidden="true">
+      <span class="vela vela--uno"></span>
+      <span class="vela vela--dos"></span>
+      <span class="vela vela--tres"></span>
+      <span class="halo"></span>
+    </div>
+  </section>
+
+  <!-- Categorías -->
+  {% if categorias %}
+    <section class="seccion">
+      <header class="seccion__cabecera">
+        <h2 class="seccion__titulo">Explora por categoría</h2>
+        <a class="enlace-mas" href="{% url 'catalogo:listar' %}">Ver todo →</a>
+      </header>
+      <ul class="rejilla-categorias">
+        {% for categoria in categorias %}
+          <li>
+            <a class="tarjeta-categoria" href="{{ categoria.get_absolute_url }}">
+              <span class="tarjeta-categoria__nombre">{{ categoria.nombre }}</span>
+              <span class="tarjeta-categoria__conteo">
+                {{ categoria.total }} producto{{ categoria.total|pluralize:"s" }}
+              </span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <!-- Destacados -->
+  <section class="seccion">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Los más pedidos</h2>
+      <a class="enlace-mas" href="{% url 'catalogo:listar' %}?orden=relevancia">Ver catálogo →</a>
+    </header>
+
+    {% if destacados %}
+      <div class="rejilla-productos">
+        {% for producto in destacados %}
+          {% include 'partials/producto_card.html' with producto=producto %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="vacio">
+        <p>Todavía no hay productos cargados.</p>
+        <p class="vacio__pista">Ejecuta <code>python manage.py cargar_catalogo</code> para importar el catálogo inicial.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Cómo funciona -->
+  <section class="seccion seccion--pasos">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Comprar es simple</h2>
+    </header>
+    <ol class="pasos">
+      <li>
+        <span class="pasos__numero">1</span>
+        <h3>Elige tus aromas</h3>
+        <p>Navega el catálogo y agrega al carrito lo que te interesa.</p>
+      </li>
+      <li>
+        <span class="pasos__numero">2</span>
+        <h3>Completa tus datos</h3>
+        <p>Nombre, teléfono y dirección para despacho o retiro.</p>
+      </li>
+      <li>
+        <span class="pasos__numero">3</span>
+        <h3>Confirma por WhatsApp</h3>
+        <p>Te abrimos un chat con el resumen listo para enviar.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- Novedades -->
+  {% if nuevos %}
+    <section class="seccion">
+      <header class="seccion__cabecera">
+        <h2 class="seccion__titulo">Recién llegados al catálogo</h2>
+        <a class="enlace-mas" href="{% url 'catalogo:listar' %}?orden=nuevos">Ver todos →</a>
+      </header>
+      <div class="rejilla-productos">
+        {% for producto in nuevos %}
+          {% include 'partials/producto_card.html' with producto=producto %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

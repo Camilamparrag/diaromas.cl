@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis datos{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Mis datos</span>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1 class="encabezado-seccion__titulo">Mis datos</h1>
+    <p class="encabezado-seccion__bajada">
+      Con estos datos prellenamos el checkout y armamos el mensaje de WhatsApp.
+    </p>
+  </header>
+
+  <div class="perfil">
+    <form method="post" class="formulario">
+      {% csrf_token %}
+
+      <div class="formulario__fila">
+        <div class="campo-grupo">
+          <label for="{{ form.first_name.id_for_label }}">Nombre</label>
+          {{ form.first_name }}
+        </div>
+        <div class="campo-grupo">
+          <label for="{{ form.last_name.id_for_label }}">Apellido</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+
+      <div class="formulario__fila">
+        <div class="campo-grupo">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}<p class="campo__error">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="campo-grupo">
+          <label for="{{ form.telefono.id_for_label }}">Teléfono / WhatsApp</label>
+          {{ form.telefono }}
+        </div>
+      </div>
+
+      <div class="campo-grupo">
+        <label for="{{ form.aromas_favoritos.id_for_label }}">Aromas favoritos</label>
+        {{ form.aromas_favoritos }}
+        <p class="campo__ayuda">Nos sirve para sugerirte productos que realmente te gustan.</p>
+      </div>
+
+      <label class="casilla">
+        {{ form.recibe_novedades }}
+        <span>{{ form.recibe_novedades.label }}</span>
+      </label>
+
+      <button class="boton boton--primario boton--grande" type="submit">Guardar cambios</button>
+    </form>
+
+    <aside class="tarjeta-datos">
+      <h2 class="tarjeta-datos__titulo">Tu cuenta</h2>
+      <dl>
+        <div>
+          <dt>Usuario</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div>
+          <dt>Miembro</dt>
+          <dd>{{ perfil.antiguedad }}</dd>
+        </div>
+        <div>
+          <dt>Pedidos</dt>
+          <dd>{{ user.pedidos.count }}</dd>
+        </div>
+      </dl>
+
+      {% if perfil.necesita_datos %}
+        <p class="aviso aviso--info">
+          <span>Completa tu teléfono y nombre para comprar más rápido.</span>
+        </p>
+      {% endif %}
+
+      <a class="boton boton--contorno boton--completo" href="{% url 'pedidos:mis_pedidos' %}">
+        Ver mis pedidos
+      </a>
+
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button class="boton boton--enlace boton--completo" type="submit">Cerrar sesión</button>
+      </form>
+    </aside>
+  </div>
+{% endblock %}

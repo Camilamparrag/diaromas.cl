@@ -1,0 +1,36 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+local_settings.py
+
+# Variables de entorno (nunca subir el .env real)
+.env
+.env.*
+!.env.example
+
+# Docker
+docker-data/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

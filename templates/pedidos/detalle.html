@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load moneda %}
+
+{% block title %}Pedido {{ pedido.code }}{% endblock %}
+
+{% block contenido %}
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    {% if user.is_authenticated %}
+      <a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a>
+    {% endif %}
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ pedido.code }}</span>
+  </nav>
+
+  <header class="encabezado-seccion encabezado-seccion--fila">
+    <div>
+      <p class="etiqueta etiqueta--suave">{{ pedido.code }}</p>
+      <h1 class="encabezado-seccion__titulo">Detalle del pedido</h1>
+      <p class="encabezado-seccion__bajada">
+        Realizado el {{ pedido.creado_en|date:"d/m/Y \a \l\a\s H:i" }}
+      </p>
+    </div>
+    <span class="estado estado--{{ pedido.estado|lower }}">{{ pedido.estado_label }}</span>
+  </header>
+
+  <!-- Línea de tiempo del estado -->
+  {% if pedido.estado != 'CANCELADO' %}
+    <ol class="linea-tiempo">
+      <li class="linea-tiempo__paso {% if pedido.estado_paso >= 0 %}activo{% endif %}">
+        <span class="linea-tiempo__punto"></span> Pendiente
+      </li>
+      <li class="linea-tiempo__paso {% if pedido.estado_paso >= 1 %}activo{% endif %}">
+        <span class="linea-tiempo__punto"></span> Confirmado
+      </li>
+      <li class="linea-tiempo__paso {% if pedido.estado_paso >= 2 %}activo{% endif %}">
+        <span class="linea-tiempo__punto"></span> En preparación
+      </li>
+      <li class="linea-tiempo__paso {% if pedido.estado_paso >= 3 %}activo{% endif %}">
+        <span class="linea-tiempo__punto"></span> Enviado
+      </li>
+      <li class="linea-tiempo__paso {% if pedido.estado_paso >= 4 %}activo{% endif %}">
+        <span class="linea-tiempo__punto"></span> Entregado
+      </li>
+    </ol>
+  {% endif %}
+
+  <div class="detalle-pedido">
+    <section class="tarjeta-resumen">
+      <h2 class="tarjeta-resumen__titulo">Productos</h2>
+      <ul class="tarjeta-resumen__items">
+        {% for item in pedido.items.all %}
+          <li>
+            {% if item.producto_activo %}
+              <span>
+                {{ item.cantidad }} × <a href="{{ item.producto.get_absolute_url }}">{{ item.producto_nombre }}</a>
+              </span>
+            {% else %}
+              <span>{{ item.cantidad }} × {{ item.producto_nombre }} <small>(no disponible)</small></span>
+            {% endif %}
+            <span>{{ item.subtotal|clp }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <dl class="resumen__lista">
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ pedido.subtotal|clp }}</dd>
+        </div>
+        <div>
+          <dt>Envío</dt>
+          <dd>A coordinar</dd>
+        </div>
+        <div class="resumen__total">
+          <dt>Total</dt>
+          <dd>{{ pedido.total|clp }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <aside class="tarjeta-datos">
+      <h2 class="tarjeta-datos__titulo">Datos del pedido</h2>
+      <dl>
+        <div>
+          <dt>Cliente</dt>
+          <dd>{{ pedido.cliente_nombre }}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{{ pedido.cliente_telefono }}</dd>
+        </div>
+        {% if pedido.cliente_email %}
+          <div>
+            <dt>Email</dt>
+            <dd>{{ pedido.cliente_email }}</dd>
+          </div>
+        {% endif %}
+        <div>
+          <dt>Entrega</dt>
+          <dd>{{ pedido.entrega_label }}</dd>
+        </div>
+        {% if pedido.direccion_completa %}
+          <div>
+            <dt>Dirección</dt>
+            <dd>{{ pedido.direccion_completa }}</dd>
+          </div>
+        {% endif %}
+        {% if pedido.notas %}
+          <div>
+            <dt>Notas</dt>
+            <dd>{{ pedido.notas }}</dd>
+          </div>
+        {% endif %}
+        {% if pedido.whatsapp_enviado_en %}
+          <div>
+            <dt>WhatsApp</dt>
+            <dd>Enviado el {{ pedido.whatsapp_enviado_en|date:"d/m/Y H:i" }}</dd>
+          </div>
+        {% endif %}
+      </dl>
+
+      <a
+        class="boton boton--acento boton--completo"
+        href="{% url 'pedidos:whatsapp' pedido.code %}"
+        target="_blank"
+        rel="noopener"
+      >
+        Reenviar por WhatsApp
+      </a>
+    </aside>
+  </div>
+
+  <details class="mensaje-oculto">
+    <summary>Mensaje que enviamos por WhatsApp</summary>
+    <pre class="mensaje-oculto__texto">{{ mensaje_whatsapp }}</pre>
+  </details>
+{% endblock %}

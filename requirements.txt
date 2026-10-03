@@ -1,0 +1,23 @@
+# Dependencias de producción de Diaromas
+# Versiones pineadas para builds reproducibles.
+
+# Framework
+Django==6.1.1
+
+# Driver PostgreSQL (psycopg 3) con wheels incluidos -> no requiere libpq-dev
+psycopg[binary]==3.3.6
+
+# Validación y procesamiento de imágenes de productos
+Pillow==12.3.0
+
+# Carga de variables de entorno desde .env
+python-dotenv==1.2.4
+
+# Permite configurar la BD con una sola variable DATABASE_URL
+dj-database-url==3.1.2
+
+# Servir estáticosCompressed (incluye hashing) desde la app
+whitenoise==6.12.0
+
+# Servidor WSGI para producción
+gunicorn==26.2.0

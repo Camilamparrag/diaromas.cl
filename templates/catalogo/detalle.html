@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static moneda %}
+
+{% block title %}{{ producto.nombre }}{% endblock %}
+{% block descripcion %}{{ producto.descripcion_corta }}{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="{% url 'catalogo:listar' %}">Catálogo</a>
+    <span aria-hidden="true">/</span>
+    <a href="{{ producto.categoria.get_absolute_url }}">{{ producto.categoria.nombre }}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ producto.nombre }}</span>
+  </nav>
+
+  <article class="detalle">
+    <div class="detalle__galeria">
+      <div class="detalle__imagen">
+        <img
+          src="{{ producto.imagen_url }}"
+          alt="{{ producto.nombre }}"
+          data-fallback="{% static 'img/productos/placeholder.svg' %}"
+        />
+        {% if producto.precio_anterior %}
+          <span class="etiqueta etiqueta--descuento">-{{ producto.porcentaje_descuento }}%</span>
+        {% endif %}
+      </div>
+      {% if producto.galeria.exists %}
+        <ul class="detalle__miniaturas">
+          {% for imagen in producto.galeria.all %}
+            <li><img src="{{ imagen.imagen.url }}" alt="{{ producto.nombre }} — vista {{ forloop.counter }}" loading="lazy" /></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    <div class="detalle__info">
+      <p class="detalle__categoria">{{ producto.categoria.nombre }}</p>
+      <h1 class="detalle__titulo">{{ producto.nombre }}</h1>
+      <p class="detalle__resumen">{{ producto.descripcion_corta }}</p>
+
+      {% if producto.lista_notas %}
+        <ul class="notas-aroma">
+          {% for nota in producto.lista_notas %}
+            <li>{{ nota }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <p class="detalle__precio">
+        <span class="precio__valor">{{ producto.precio|clp }}</span>
+        {% if producto.precio_anterior %}
+          <s class="precio__anterior">{{ producto.precio_anterior|clp }}</s>
+          <span class="etiqueta etiqueta--descuento">Ahorras {{ producto.porcentaje_descuento }}%</span>
+        {% endif %}
+      </p>
+      <p class="detalle__iva">Precio con IVA incluido · Envío se coordina por WhatsApp</p>
+
+      <ul class="detalle__ficha">
+        {% if producto.etiqueta_volumen %}
+          <li><span>Contenido</span><strong>{{ producto.etiqueta_volumen }}</strong></li>
+        {% endif %}
+        {% if producto.etiqueta_duracion %}
+          <li><span>Rinde</span><strong>{{ producto.etiqueta_duracion }}</strong></li>
+        {% endif %}
+        <li>
+          <span>Disponibilidad</span>
+          <strong>
+            {% if producto.agotado %}Agotado{% else %}En stock{% endif %}
+          </strong>
+        </li>
+      </ul>
+
+      {% if producto.descripcion %}
+        <div class="detalle__descripcion">
+          <h2>Detalles</h2>
+          <p>{{ producto.descripcion|linebreaks }}</p>
+        </div>
+      {% endif %}
+
+      {% if producto.disponible %}
+        <form method="post" action="{% url 'pedidos:agregar' producto.pk %}" class="detalle__compra">
+          {% csrf_token %}
+          <input type="hidden" name="volver" value="{{ request.get_full_path }}" />
+
+          <div class="selector-cantidad">
+            <label for="cantidad">Cantidad</label>
+            <div class="selector-cantidad__controles">
+              <button type="button" data-restar aria-label="Restar uno">−</button>
+              <input
+                type="number"
+                id="cantidad"
+                name="cantidad"
+                value="1"
+                min="1"
+                max="{{ producto.stock }}"
+                inputmode="numeric"
+              />
+              <button type="button" data-sumar aria-label="Sumar uno">+</button>
+            </div>
+            {% if cantidad_en_carrito %}
+              <p class="selector-cantidad__nota">Ya tienes {{ cantidad_en_carrito }} en el carrito.</p>
+            {% endif %}
+          </div>
+
+          <div class="detalle__acciones">
+            <button class="boton boton--primario boton--grande" type="submit">Agregar al carrito</button>
+            <button class="boton boton--acento boton--grande" type="submit" name="ir_al_carrito" value="1">
+              Comprar ahora
+            </button>
+          </div>
+        </form>
+
+        <p class="detalle__ayuda">
+          ¿Tienes dudas? <a href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+          y te asesoramos según tu espacio.
+        </p>
+      {% else %}
+        <p class="aviso aviso--info">
+          Este producto está agotado por ahora. Avísanos por WhatsApp si quieres que te
+          avise cuando vuelva.
+        </p>
+      {% endif %}
+    </div>
+  </article>
+
+  {% if relacionados %}
+    <section class="seccion">
+      <header class="seccion__cabecera">
+        <h2 class="seccion__titulo">También te puede gustar</h2>
+      </header>
+      <div class="rejilla-productos">
+        {% for otro in relacionados %}
+          {% include 'partials/producto_card.html' with producto=otro %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

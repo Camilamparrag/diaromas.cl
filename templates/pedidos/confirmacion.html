@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load moneda %}
+
+{% block title %}Pedido {{ pedido.code }} confirmado{% endblock %}
+
+{% block contenido %}
+  <section class="confirmacion">
+    <div class="confirmacion__marca" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    </div>
+
+    <p class="confirmacion__eyebrow">Pedido registrado</p>
+    <h1 class="confirmacion__titulo">Gracias, {{ pedido.cliente_nombre|truncatewords:1 }}. Falta un paso.</h1>
+    <p class="confirmacion__bajada">
+      Te llevamos a WhatsApp con el resumen del pedido
+      <strong>{{ pedido.code }}</strong>. Solo confirma stock, envío y forma de pago, y
+      lo dejamos listo.
+    </p>
+
+    <div class="confirmacion__codigo">
+      <span>Código de pedido</span>
+      <strong>{{ pedido.code }}</strong>
+    </div>
+
+    <!-- Botón principal + auto redirección (pasa por nuestra vista para registrar el envío) -->
+    <a
+      class="boton boton--whatsapp boton--grande"
+      href="{% url 'pedidos:whatsapp' pedido.code %}"
+      data-whatsapp="{% url 'pedidos:whatsapp' pedido.code %}"
+      target="_blank"
+      rel="noopener"
+    >
+      Abrir WhatsApp con el pedido
+    </a>
+    <p class="confirmacion__nota" data-whatsapp-estado>
+      Si no se abrió automáticamente, usa el botón. En celular abre la app de WhatsApp.
+    </p>
+
+    <!-- Resumen del pedido -->
+    <div class="tarjeta-resumen">
+      <h2 class="tarjeta-resumen__titulo">Resumen</h2>
+
+      <ul class="tarjeta-resumen__items">
+        {% for item in pedido.items.all %}
+          <li>
+            <span>
+              {{ item.cantidad }} × {{ item.producto_nombre }}
+            </span>
+            <span>{{ item.subtotal|clp }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <dl class="resumen__lista">
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ pedido.subtotal|clp }}</dd>
+        </div>
+        <div>
+          <dt>Entrega</dt>
+          <dd>{{ pedido.entrega_label }}</dd>
+        </div>
+        <div class="resumen__total">
+          <dt>Total</dt>
+          <dd>{{ pedido.total|clp }}</dd>
+        </div>
+      </dl>
+
+      <p class="tarjeta-resumen__dato">
+        <strong>Enviaremos a:</strong> {{ pedido.direccion_completa|default:"coordinar por WhatsApp" }}
+      </p>
+      <p class="tarjeta-resumen__dato">
+        <strong>Teléfono:</strong> {{ pedido.cliente_telefono }}
+      </p>
+    </div>
+
+    <!-- Mensaje que se enviará -->
+    <details class="mensaje-oculto">
+      <summary>Ver el mensaje que se enviará por WhatsApp</summary>
+      <pre class="mensaje-oculto__texto">{{ mensaje_whatsapp }}</pre>
+    </details>
+
+    <p class="confirmacion__pie">
+      ¿Se cerró mal la conversación?
+      <a href="{% url 'pedidos:detalle' pedido.code %}">Revisa tu pedido</a> o
+      <a href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">escríbenos</a>.
+    </p>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // Redirección automática a WhatsApp cuando el navegador lo permite
+    (function () {
+      var enlace = document.querySelector('[data-whatsapp]');
+      if (!enlace) return;
+      var estado = document.querySelector('[data-whatsapp-estado]');
+      var url = enlace.getAttribute('data-whatsapp');
+      var redirigir = function () {
+        try {
+          window.location.href = url;
+          if (estado) {
+            estado.textContent = 'Abriendo WhatsApp… Si no pasa nada, usa el botón.';
+          }
+        } catch (error) {
+          /* el botón manual siempre está disponible */
+        }
+      };
+      // update history para que el botón «atrás» no vuelva a redirigir
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.href);
+      }
+      setTimeout(redirigir, 1400);
+    })();
+  </script>
+{% endblock %}

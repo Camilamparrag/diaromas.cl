@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load moneda %}
+
+{% block title %}Tus datos{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Checkout</span>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1 class="encabezado-seccion__titulo">Tus datos de entrega</h1>
+    <p class="encabezado-seccion__bajada">
+      Usamos estos datos solo para coordinar el pedido. Al final te llevamos a WhatsApp
+      con el resumen listo para enviar.
+    </p>
+  </header>
+
+  {% if not user.is_authenticated %}
+    <p class="aviso aviso--info">
+      <span>
+        ¿Ya tienes cuenta en Diaromas?
+        <a href="{% url 'accounts:login' %}?next={{ request.path }}">Ingresa</a> y completamos
+        estos datos automáticamente.
+      </span>
+    </p>
+  {% endif %}
+
+  <form method="post" class="checkout">
+    {% csrf_token %}
+
+    <div class="checkout__campos">
+      {% if form.non_field_errors %}
+        <div class="aviso aviso--error">
+          <span>{{ form.non_field_errors }}</span>
+        </div>
+      {% endif %}
+
+      <div class="campo-grupo campo-grupo--ancho">
+        <label for="{{ form.cliente_nombre.id_for_label }}">{{ form.cliente_nombre.label }}</label>
+        {{ form.cliente_nombre }}
+        {% if form.cliente_nombre.errors %}
+          <p class="campo__error">{{ form.cliente_nombre.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="campo-grupo">
+        <label for="{{ form.cliente_telefono.id_for_label }}">{{ form.cliente_telefono.label }}</label>
+        {{ form.cliente_telefono }}
+        {% if form.cliente_telefono.errors %}
+          <p class="campo__error">{{ form.cliente_telefono.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="campo-grupo">
+        <label for="{{ form.cliente_email.id_for_label }}">{{ form.cliente_email.label }} (opcional)</label>
+        {{ form.cliente_email }}
+        {% if form.cliente_email.errors %}
+          <p class="campo__error">{{ form.cliente_email.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <fieldset class="campo-grupo campo-grupo--ancho">
+        <legend>{{ form.entrega.label }}</legend>
+        <div class="opciones">
+          {% for radio in form.entrega %}
+            <label class="opcion">
+              {{ radio.tag }}
+              <span>{{ radio.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="campo-grupo campo-grupo--ancho">
+        <label for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
+        {{ form.direccion }}
+        {% if form.direccion.errors %}
+          <p class="campo__error">{{ form.direccion.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="campo-grupo">
+        <label for="{{ form.comuna.id_for_label }}">{{ form.comuna.label }}</label>
+        {{ form.comuna }}
+        {% if form.comuna.errors %}
+          <p class="campo__error">{{ form.comuna.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="campo-grupo">
+        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+        {{ form.region }}
+        {% if form.region.errors %}
+          <p class="campo__error">{{ form.region.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="campo-grupo campo-grupo--ancho">
+        <label for="{{ form.notas.id_for_label }}">{{ form.notas.label }}</label>
+        {{ form.notas }}
+      </div>
+    </div>
+
+    <aside class="resumen">
+      <h2 class="resumen__titulo">Tu pedido</h2>
+
+      <ul class="resumen__items">
+        {% for item in items %}
+          <li>
+            <span class="resumen__item-nombre">
+              {{ item.producto.nombre }}
+              <small>× {{ item.cantidad }}</small>
+            </span>
+            <span>{{ item.subtotal|clp }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <dl class="resumen__lista">
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ carrito.subtotal|clp }}</dd>
+        </div>
+        <div>
+          <dt>Envío</dt>
+          <dd>A coordinar</dd>
+        </div>
+        <div class="resumen__total">
+          <dt>Total estimado</dt>
+          <dd>{{ carrito.subtotal|clp }}</dd>
+        </div>
+      </dl>
+
+      <button class="boton boton--acento boton--grande boton--completo" type="submit">
+        Confirmar y abrir WhatsApp
+      </button>
+      <p class="resumen__nota">
+        Ningún pago se realiza en la web: coordinas todo con el negocio por WhatsApp.
+      </p>
+      <a class="boton boton--enlace boton--completo" href="{% url 'pedidos:carrito' %}">Volver al carrito</a>
+    </aside>
+  </form>
+{% endblock %}

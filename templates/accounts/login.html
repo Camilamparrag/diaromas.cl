@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Ingresa{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <section class="acceso">
+    <div class="acceso__panel">
+      <p class="acceso__eyebrow">Bienvenido de vuelta</p>
+      <h1 class="acceso__titulo">Ingresa a tu cuenta</h1>
+      <p class="acceso__bajada">
+        Así guardamos tus datos de entrega y el historial de pedidos.
+      </p>
+
+      <form method="post" class="formulario">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="aviso aviso--error"><span>Usuario o contraseña incorrectos.</span></div>
+        {% endif %}
+
+        <div class="campo-grupo">
+          <label for="{{ form.username.id_for_label }}">Usuario o email</label>
+          {{ form.username }}
+        </div>
+
+        <div class="campo-grupo">
+          <label for="{{ form.password.id_for_label }}">Contraseña</label>
+          {{ form.password }}
+        </div>
+
+        <input type="hidden" name="next" value="{{ next }}" />
+
+        <button class="boton boton--primario boton--grande boton--completo" type="submit">
+          Ingresar
+        </button>
+      </form>
+
+      <p class="acceso__pie">
+        ¿Todavía no tienes cuenta?
+        <a href="{% url 'accounts:registro' %}">Créala aquí</a>.
+      </p>
+    </div>
+
+    <aside class="acceso__extra">
+      <h2>Ventajas de tener cuenta</h2>
+      <ul class="lista-ventajas">
+        <li>Prellenado de tus datos al checkout.</li>
+        <li>Historial de pedidos y estados.</li>
+        <li>Reenviar un pedido por WhatsApp cuando quieras.</li>
+      </ul>
+    </aside>
+  </section>
+{% endblock %}

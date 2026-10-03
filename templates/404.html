@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Página no encontrada{% endblock %}
+
+{% block contenido %}
+  <section class="vacio vacio--grande">
+    <p class="acceso__eyebrow">Error 404</p>
+    <h1>Esta página se fue con el aroma</h1>
+    <p>No encontramos lo que buscabas. Vuelve al catálogo y sigue explorando.</p>
+    <a class="boton boton--primario boton--grande" href="{% url 'catalogo:listar' %}">Ver catálogo</a>
+  </section>
+{% endblock %}

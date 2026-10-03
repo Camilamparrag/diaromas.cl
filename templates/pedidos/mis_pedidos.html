@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load moneda %}
+
+{% block title %}Mis pedidos{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Mis pedidos</span>
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1 class="encabezado-seccion__titulo">Mis pedidos</h1>
+    <p class="encabezado-seccion__bajada">
+      Cada pedido se confirmó por WhatsApp. Si necesitas cambiar algo, escríbenos con tu
+      código de pedido.
+    </p>
+  </header>
+
+  {% if pedidos %}
+    <div class="lista-pedidos">
+      {% for pedido in pedidos %}
+        <article class="tarjeta-pedido">
+          <div class="tarjeta-pedido__cabecera">
+            <div>
+              <p class="tarjeta-pedido__codigo">{{ pedido.code }}</p>
+              <p class="tarjeta-pedido__fecha">{{ pedido.creado_en|date:"d/m/Y" }}</p>
+            </div>
+            <span class="estado estado--{{ pedido.estado|lower }}">{{ pedido.estado_label }}</span>
+          </div>
+
+          <ul class="tarjeta-pedido__items">
+            {% for item in pedido.items.all %}
+              <li>
+                <span>{{ item.cantidad }} × {{ item.producto_nombre }}</span>
+                <span>{{ item.subtotal|clp }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <div class="tarjeta-pedido__pie">
+            <p class="tarjeta-pedido__total">
+              Total <strong>{{ pedido.total|clp }}</strong>
+            </p>
+            <div class="tarjeta-pedido__acciones">
+              <a class="boton boton--contorno boton--pequeno" href="{% url 'pedidos:detalle' pedido.code %}">
+                Ver detalle
+              </a>
+              <a
+                class="boton boton--acento boton--pequeno"
+                href="{% url 'pedidos:whatsapp' pedido.code %}"
+                target="_blank"
+                rel="noopener"
+              >
+                Reenviar por WhatsApp
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="vacio">
+      <h2>Todavía no tienes pedidos</h2>
+      <p>Cuando confirmes tu primera compra aparecerá aquí con su estado.</p>
+      <a class="boton boton--primario" href="{% url 'catalogo:listar' %}">Ver catálogo</a>
+    </div>
+  {% endif %}
+{% endblock %}

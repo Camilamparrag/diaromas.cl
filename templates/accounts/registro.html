@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Crea tu cuenta{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <section class="acceso">
+    <div class="acceso__panel">
+      <p class="acceso__eyebrow">Bienvenido a Diaromas</p>
+      <h1 class="acceso__titulo">Crea tu cuenta</h1>
+      <p class="acceso__bajada">Toma un minuto y tus pedidos quedan guardados.</p>
+
+      <form method="post" class="formulario formulario--registro">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="aviso aviso--error"><span>{{ form.non_field_errors }}</span></div>
+        {% endif %}
+
+        <div class="formulario__fila">
+          <div class="campo-grupo">
+            <label for="{{ form.first_name.id_for_label }}">Nombre</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<p class="campo__error">{{ form.first_name.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="campo-grupo">
+            <label for="{{ form.last_name.id_for_label }}">Apellido</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<p class="campo__error">{{ form.last_name.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div class="formulario__fila">
+          <div class="campo-grupo">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="campo__error">{{ form.email.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="campo-grupo">
+            <label for="{{ form.telefono.id_for_label }}">Teléfono / WhatsApp</label>
+            {{ form.telefono }}
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="{{ form.username.id_for_label }}">Usuario</label>
+          {{ form.username }}
+          {% if form.username.errors %}<p class="campo__error">{{ form.username.errors.0 }}</p>{% endif %}
+          <p class="campo__ayuda">{{ form.username.help_text }}</p>
+        </div>
+
+        <div class="formulario__fila">
+          <div class="campo-grupo">
+            <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}<p class="campo__error">{{ form.password1.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="campo-grupo">
+            <label for="{{ form.password2.id_for_label }}">Repite la contraseña</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}<p class="campo__error">{{ form.password2.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <label class="casilla">
+          {{ form.acepta_terminos }}
+          <span>{{ form.acepta_terminos.label }}</span>
+        </label>
+        {% if form.acepta_terminos.errors %}<p class="campo__error">{{ form.acepta_terminos.errors.0 }}</p>{% endif %}
+
+        <button class="boton boton--primario boton--grande boton--completo" type="submit">
+          Crear cuenta
+        </button>
+      </form>
+
+      <p class="acceso__pie">
+        ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Ingresa</a>.
+      </p>
+    </div>
+
+    <aside class="acceso__extra">
+      <h2>Lo que incluye tu cuenta</h2>
+      <ul class="lista-ventajas">
+        <li>Historial completo de pedidos.</li>
+        <li>Datos de entrega siempre listos.</li>
+        <li>Reenvío del resumen por WhatsApp.</li>
+      </ul>
+    </aside>
+  </section>
+{% endblock %}

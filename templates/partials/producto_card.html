@@ -1,0 +1,47 @@
+{% load static moneda %}
+<article class="tarjeta-producto">
+  <a class="tarjeta-producto__imagen" href="{{ producto.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+    <img
+      src="{{ producto.imagen_url }}"
+      alt=""
+      loading="lazy"
+      data-fallback="{% static 'img/productos/placeholder.svg' %}"
+    />
+    {% if producto.precio_anterior %}
+      <span class="etiqueta etiqueta--descuento">-{{ producto.porcentaje_descuento }}%</span>
+    {% endif %}
+    {% if producto.agotado %}
+      <span class="etiqueta etiqueta--agotado">Agotado</span>
+    {% endif %}
+  </a>
+
+  <div class="tarjeta-producto__cuerpo">
+    <p class="tarjeta-producto__categoria">{{ producto.categoria.nombre }}</p>
+    <h3 class="tarjeta-producto__nombre">
+      <a href="{{ producto.get_absolute_url }}">{{ producto.nombre }}</a>
+    </h3>
+    <p class="tarjeta-producto__notas">{{ producto.notas_aroma|default:producto.descripcion_corta }}</p>
+
+    <div class="tarjeta-producto__pie">
+      <p class="precio">
+        <span class="precio__valor">{{ producto.precio|clp }}</span>
+        {% if producto.precio_anterior %}
+          <s class="precio__anterior">{{ producto.precio_anterior|clp }}</s>
+        {% endif %}
+      </p>
+
+      {% if producto.disponible %}
+        <form method="post" action="{% url 'pedidos:agregar' producto.pk %}" class="form-agregar">
+          {% csrf_token %}
+          <input type="hidden" name="cantidad" value="1" />
+          <input type="hidden" name="volver" value="{{ request.get_full_path }}" />
+          <button class="boton boton--primario boton--pequeno" type="submit" aria-label="Agregar {{ producto.nombre }} al carrito">
+            Agregar
+          </button>
+        </form>
+      {% else %}
+        <span class="boton boton--deshabilitado boton--pequeno">Sin stock</span>
+      {% endif %}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,58 @@
+{% load static %}
+<footer class="pie">
+  <div class="contenedor pie__interior">
+    <div class="pie__marca">
+      <span class="marca__nombre marca__nombre--pie">Diaromas</span>
+      <p>
+        Aromatizantes, difusores y aceites esenciales para que tu casa huela a lo que
+        quieres recordar.
+      </p>
+      <a
+        class="boton boton--acento boton--pequeno"
+        href="{{ whatsapp_contacto }}"
+        target="_blank"
+        rel="noopener"
+      >
+        Escríbenos por WhatsApp
+      </a>
+    </div>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Tienda</h2>
+      <ul>
+        <li><a href="{% url 'catalogo:listar' %}">Todo el catálogo</a></li>
+        <li><a href="{% url 'catalogo:listar' %}?categoria=difusores">Difusores</a></li>
+        <li><a href="{% url 'catalogo:listar' %}?categoria=aromatizantes">Velas aromáticas</a></li>
+        <li><a href="{% url 'catalogo:listar' %}?categoria=kits-y-regalos">Kits y regalos</a></li>
+      </ul>
+    </div>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Tu cuenta</h2>
+      <ul>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'accounts:perfil' %}">Mis datos</a></li>
+          <li><a href="{% url 'pedidos:mis_pedidos' %}">Mis pedidos</a></li>
+        {% else %}
+          <li><a href="{% url 'accounts:login' %}">Ingresar</a></li>
+          <li><a href="{% url 'accounts:registro' %}">Crear cuenta</a></li>
+        {% endif %}
+        <li><a href="{% url 'pedidos:carrito' %}">Carrito</a></li>
+      </ul>
+    </div>
+
+    <div class="pie__columna">
+      <h2 class="pie__titulo">Cómo comprar</h2>
+      <ol class="pie__pasos">
+        <li>Elige tus productos y agrégalos al carrito.</li>
+        <li>Completa tus datos de entrega.</li>
+        <li>Te llevamos a WhatsApp para confirmar.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="contenedor pie__legal">
+    <p>&copy; {% now "Y" %} Diaromas · Chile</p>
+    <p>Precios en CLP con IVA incluido · Envíos a todo Chile</p>
+  </div>
+</footer>

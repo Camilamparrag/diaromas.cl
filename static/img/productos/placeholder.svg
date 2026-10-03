@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Diaromas">
+  <rect width="800" height="1000" fill="#dddad2"/>
+  <g fill="none" stroke="#b8b4a8" stroke-width="3">
+    <circle cx="400" cy="470" r="130"/>
+    <path d="M330 470h140M400 400v140"/>
+  </g>
+  <text x="400" y="905" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="30" letter-spacing="6" fill="#7c7a70">DIAROMAS</text>
+</svg>

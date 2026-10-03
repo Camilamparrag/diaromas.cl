@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load moneda %}
+
+{% block title %}{% if categoria %}{{ categoria.nombre }}{% else %}Catálogo{% endif %}{% endblock %}
+
+{% block descripcion %}
+  {% if categoria %}{{ categoria.descripcion }}{% else %}Velas aromáticas, difusores y aceites esenciales.{% endif %}
+{% endblock %}
+
+{% block contenido %}
+  {% include 'partials/alertas.html' %}
+
+  <nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'home' %}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="{% url 'catalogo:listar' %}">Catálogo</a>
+    {% if categoria %}
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ categoria.nombre }}</span>
+    {% endif %}
+  </nav>
+
+  <header class="encabezado-seccion">
+    <h1 class="encabezado-seccion__titulo">
+      {% if categoria %}{{ categoria.nombre }}{% else %}Todo el catálogo{% endif %}
+    </h1>
+    {% if categoria.descripcion %}
+      <p class="encabezado-seccion__bajada">{{ categoria.descripcion }}</p>
+    {% else %}
+      <p class="encabezado-seccion__bajada">
+        Cada producto está hecho con esencias naturales. Después de las 20:00 nuestro
+        equipo no está en línea, así que responde nuestro WhatsApp en horario de día.
+      </p>
+    {% endif %}
+  </header>
+
+  <div class="catalogo">
+    <!-- Filtros -->
+    <aside class="filtros">
+      <form method="get" class="filtros__form">
+        {% if consulta %}<input type="hidden" name="q" value="{{ consulta }}" />{% endif %}
+        {% if categoria %}<input type="hidden" name="categoria" value="{{ categoria.slug }}" />{% endif %}
+
+        <h2 class="filtros__titulo">Categorías</h2>
+        <ul class="filtros__lista">
+          <li>
+            <a href="{% url 'catalogo:listar' %}" class="{% if not categoria %}activo{% endif %}">
+              Todas
+            </a>
+          </li>
+          {% for item in categorias %}
+            <li>
+              <a
+                href="{% url 'catalogo:listar' %}?categoria={{ item.slug }}"
+                class="{% if categoria.slug == item.slug %}activo{% endif %}"
+              >
+                {{ item.nombre }} <span class="filtros__conteo">{{ item.total }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <h2 class="filtros__titulo">Precio hasta</h2>
+        <ul class="filtros__lista">
+          {% for valor, etiqueta in rangos_precio.items %}
+            <li>
+              <a
+                href="?{% if categoria %}categoria={{ categoria.slug }}&amp;{% endif %}precio={{ valor }}"
+                class="{% if precio_max == valor|stringformat:'s' %}activo{% endif %}"
+              >
+                {% if valor == '0' %}Sin límite{% else %}{{ etiqueta|clp }}{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <button class="boton boton--contorno boton--completo" type="submit">Aplicar filtros</button>
+      </form>
+
+      <div class="filtros__ayuda">
+        <p class="filtros__titulo">¿Dudas con un aroma?</p>
+        <p>Escríbenos y te asesoramos según tu espacio y gusto.</p>
+        <a class="boton boton--acento boton--pequeno boton--completo" href="{{ whatsapp_contacto }}" target="_blank" rel="noopener">
+          WhatsApp
+        </a>
+      </div>
+    </aside>
+
+    <!-- Resultados -->
+    <section class="resultados">
+      <div class="resultados__barra">
+        <p class="resultados__conteo">
+          {{ productos|length }} producto{{ productos|length|pluralize:"s" }}
+          {% if consulta %} para “{{ consulta }}”{% endif %}
+        </p>
+
+        <form method="get" class="ordenador">
+          {% for clave, valor in request.GET.items %}
+            {% if clave != 'orden' %}<input type="hidden" name="{{ clave }}" value="{{ valor }}" />{% endif %}
+          {% endfor %}
+          <label for="orden">Ordenar</label>
+          <select id="orden" name="orden" onchange="this.form.submit()">
+            <option value="relevancia" {% if orden == 'relevancia' %}selected{% endif %}>Relevancia</option>
+            <option value="precio-asc" {% if orden == 'precio-asc' %}selected{% endif %}>Precio: menor a mayor</option>
+            <option value="precio-desc" {% if orden == 'precio-desc' %}selected{% endif %}>Precio: mayor a menor</option>
+            <option value="nuevos" {% if orden == 'nuevos' %}selected{% endif %}>Novedades</option>
+          </select>
+          <noscript><button class="boton boton--pequeno" type="submit">Ir</button></noscript>
+        </form>
+      </div>
+
+      {% if productos %}
+        <div class="rejilla-productos">
+          {% for producto in productos %}
+            {% include 'partials/producto_card.html' with producto=producto %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="vacio">
+          <h2>No encontramos productos</h2>
+          <p>Prueba con otro término de búsqueda o revisa todas las categorías.</p>
+          <a class="boton boton--primario" href="{% url 'catalogo:listar' %}">Ver todo el catálogo</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
